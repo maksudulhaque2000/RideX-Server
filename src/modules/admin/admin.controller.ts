@@ -31,6 +31,21 @@ const getAllDrivers = async (req: Request, res: Response) => {
     }
   };
 
+const getAllRides = async (req: Request, res: Response) => {
+    try {
+      const result = await adminServices.getAllRides(req.query);
+      res
+        .status(200)
+        .json({ success: true, message: 'All rides fetched successfully', data: result.data, meta: result.meta });
+    } catch (error: unknown) {
+      res.status(500).json({
+        success: false,
+        message: 'Failed to fetch rides',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+    }
+};
+
 const getDashboardAnalytics = async (req: Request, res: Response) => {
     try {
         const result = await adminServices.getDashboardAnalytics();
@@ -88,6 +103,7 @@ const manageUserBlockStatus = async (req: Request, res: Response) => {
 export const adminControllers = {
   getAllUsers,
   getAllDrivers,
+  getAllRides,
   getDashboardAnalytics,
   manageDriverApproval,
   manageUserBlockStatus,

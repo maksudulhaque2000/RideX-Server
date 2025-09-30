@@ -6,7 +6,7 @@ const router = Router();
 
 router.get('/users', authMiddleware(['admin']), adminControllers.getAllUsers);
 router.get('/drivers', authMiddleware(['admin']), adminControllers.getAllDrivers);
-
+router.get('/rides', authMiddleware(['admin']), adminControllers.getAllRides);
 router.get('/analytics', authMiddleware(['admin']), adminControllers.getDashboardAnalytics);
 
 
