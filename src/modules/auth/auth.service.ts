@@ -4,11 +4,9 @@ import config from '../../config';
 import { User } from '../user/user.model';
 import { Driver } from '../driver/driver.model';
 
-// User Registration Logic
 const registerUser = async (payload: Record<string, unknown>) => {
   const { name, email, password, role, vehicleDetails, licenseNumber } = payload;
 
-  // Create user
   const newUser = new User({
     name,
     email,
@@ -17,7 +15,6 @@ const registerUser = async (payload: Record<string, unknown>) => {
   });
   const savedUser = await newUser.save();
 
-  // If role is driver, create a driver profile
   if (role === 'driver') {
     const newDriver = new Driver({
       userId: savedUser._id,
@@ -27,13 +24,18 @@ const registerUser = async (payload: Record<string, unknown>) => {
     await newDriver.save();
   }
   
-  // Return the created user (without password)
+  const tokenPayload = { userId: savedUser._id, role: savedUser.role };
+  const token = jwt.sign(tokenPayload, config.jwt_secret as string, { expiresIn: '1d' });
+
   const userObject = savedUser.toObject();
   const { password: _, ...userData } = userObject;
-  return userData;
+
+  return {
+    token,
+    user: userData,
+  };
 };
 
-// User Login Logic
 const loginUser = async (payload: Record<string, unknown>) => {
   const { email, password } = payload;
   const user = await User.findOne({ email: email as string }).select('+password');
@@ -50,6 +52,7 @@ const loginUser = async (payload: Record<string, unknown>) => {
   const token = jwt.sign(tokenPayload, config.jwt_secret as string, { expiresIn: '1d' });
 
   const userObject = user.toObject();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { password: _, ...userData } = userObject;
 
   return {
@@ -58,7 +61,6 @@ const loginUser = async (payload: Record<string, unknown>) => {
   };
 };
 
-// Get Profile Logic
 const getMyProfile = async(userId: string) => {
     const user = await User.findById(userId);
     if(!user){
