@@ -34,6 +34,20 @@ const loginUser = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (error: unknown) {
+    if (error instanceof Error) {
+        if (error.message.includes('blocked')) {
+            return res.status(403).json({
+                success: false,
+                message: error.message,
+            });
+        }
+        if (error.message.includes('Invalid credentials')) {
+            return res.status(401).json({
+                success: false,
+                message: error.message,
+            });
+        }
+    }
     res.status(500).json({
       success: false,
       message: 'Login failed',
