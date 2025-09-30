@@ -10,4 +10,16 @@ router.patch(
   driverControllers.updateAvailability,
 );
 
+router.get(
+  '/me/earnings',
+  authMiddleware(['driver']),
+  driverControllers.getDriverEarnings,
+);
+
+router.get(
+    '/me/earnings-analytics',
+    authMiddleware(['driver']),
+    driverControllers.getDriverEarningsAnalytics
+);
+
 export const DriverRoutes = router;
