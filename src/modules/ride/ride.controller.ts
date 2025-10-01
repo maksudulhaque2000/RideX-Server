@@ -80,6 +80,12 @@ const getPendingRideRequests = async (req: AuthRequest, res: Response) => {
         const result = await rideServices.getPendingRideRequests(driverId);
         res.status(200).json({ success: true, message: 'Pending ride requests fetched', data: result });
     } catch (error: unknown) {
+        if (error instanceof Error && error.message.includes('approved and online')) {
+            return res.status(403).json({
+                success: false,
+                message: error.message,
+            });
+        }
         res.status(500).json({
             success: false,
             message: 'Failed to fetch requests',
