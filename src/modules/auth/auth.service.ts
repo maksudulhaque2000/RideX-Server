@@ -52,7 +52,7 @@ const loginUser = async (payload: Record<string, unknown>) => {
   const token = jwt.sign(tokenPayload, config.jwt_secret as string, { expiresIn: '1d' });
 
   const userObject = user.toObject();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  
   const { password: _, ...userData } = userObject;
 
   return {
