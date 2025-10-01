@@ -100,6 +100,21 @@ const manageUserBlockStatus = async (req: Request, res: Response) => {
     }
 };
 
+const manageUserRole = async (req: Request, res: Response) => {
+    try {
+        const { userId } = req.params;
+        const { role } = req.body;
+        const result = await adminServices.manageUserRole(userId, role);
+        res.status(200).json({ success: true, message: "User role updated successfully", data: result });
+    } catch (error: unknown) {
+        res.status(400).json({
+            success: false,
+            message: 'Failed to update user role',
+            error: error instanceof Error ? error.message : 'Unknown error'
+        });
+    }
+}
+
 export const adminControllers = {
   getAllUsers,
   getAllDrivers,
@@ -107,4 +122,5 @@ export const adminControllers = {
   getDashboardAnalytics,
   manageDriverApproval,
   manageUserBlockStatus,
+  manageUserRole,
 };

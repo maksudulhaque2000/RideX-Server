@@ -2,23 +2,26 @@ import { User } from '../user/user.model';
 import { Driver } from '../driver/driver.model';
 import { Ride } from '../ride/ride.model';
 
-// Get all users (riders) with pagination and search
 const getAllUsers = async (query: Record<string, unknown>) => {
-  const { page = 1, limit = 10, searchTerm = '' } = query;
+  const { page = 1, limit = 10, searchTerm = '', role = '' } = query;
 
   const skip = (Number(page) - 1) * Number(limit);
-  const searchCondition = searchTerm
-    ? {
-        role: 'rider',
-        $or: [
-          { name: { $regex: searchTerm, $options: 'i' } },
-          { email: { $regex: searchTerm, $options: 'i' } },
-        ],
-      }
-    : { role: 'rider' };
+  
+  const queryCondition: Record<string, any> = {};
 
-  const users = await User.find(searchCondition).skip(skip).limit(Number(limit));
-  const total = await User.countDocuments(searchCondition);
+  if (role) {
+    queryCondition.role = role;
+  }
+  
+  if (searchTerm) {
+    queryCondition.$or = [
+      { name: { $regex: searchTerm, $options: 'i' } },
+      { email: { $regex: searchTerm, $options: 'i' } },
+    ];
+  }
+
+  const users = await User.find(queryCondition).skip(skip).limit(Number(limit));
+  const total = await User.countDocuments(queryCondition);
 
   return {
     meta: {
@@ -31,12 +34,21 @@ const getAllUsers = async (query: Record<string, unknown>) => {
   };
 };
 
-// Get all drivers with pagination and search
+const manageUserRole = async (userId: string, newRole: 'admin' | 'rider' | 'driver') => {
+    const user = await User.findById(userId);
+    if (!user) {
+        throw new Error('User not found');
+    }
+    user.role = newRole;
+    await user.save();
+    return user;
+}
+
+
 const getAllDrivers = async (query: Record<string, unknown>) => {
   const { page = 1, limit = 10, searchTerm = '' } = query;
   const skip = (Number(page) - 1) * Number(limit);
   
-  // We will search on the User model first to get matching user IDs
   const userSearchCondition = searchTerm
     ? {
         role: 'driver',
@@ -70,7 +82,6 @@ const getAllDrivers = async (query: Record<string, unknown>) => {
   };
 };
 
-// Get all rides with pagination and filtering
 const getAllRides = async (query: Record<string, unknown>) => {
   const { page = 1, limit = 10, status = '' } = query;
   const skip = (Number(page) - 1) * Number(limit);
@@ -99,7 +110,6 @@ const getAllRides = async (query: Record<string, unknown>) => {
   };
 };
 
-// New function for dashboard analytics
 const getDashboardAnalytics = async () => {
     const totalRiders = await User.countDocuments({ role: 'rider' });
     const totalDrivers = await User.countDocuments({ role: 'driver' });
@@ -147,7 +157,8 @@ export const adminServices = {
   getAllUsers,
   getAllDrivers,
   getAllRides,
-  getDashboardAnalytics, // Added new service
+  getDashboardAnalytics,
+  manageUserRole,
   manageDriverApproval,
   manageUserBlockStatus,
 };

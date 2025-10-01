@@ -9,7 +9,6 @@ router.get('/drivers', authMiddleware(['admin']), adminControllers.getAllDrivers
 router.get('/rides', authMiddleware(['admin']), adminControllers.getAllRides);
 router.get('/analytics', authMiddleware(['admin']), adminControllers.getDashboardAnalytics);
 
-
 router.patch(
     '/drivers/:driverId/approval',
     authMiddleware(['admin']),
@@ -20,6 +19,12 @@ router.patch(
     '/users/:userId/block',
     authMiddleware(['admin']),
     adminControllers.manageUserBlockStatus
+);
+
+router.patch(
+    '/users/:userId/role',
+    authMiddleware(['admin']),
+    adminControllers.manageUserRole
 );
 
 export const AdminRoutes = router;
