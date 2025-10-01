@@ -67,12 +67,20 @@ const getDriverEarningsAnalytics = async (driverUserId: string) => {
             $sort: { year: 1, month: 1 }
         }
     ]);
-
     return monthlyEarnings;
+}
+
+const getMyDriverProfile = async (driverUserId: string) => {
+    const profile = await Driver.findOne({ userId: driverUserId }).populate('userId');
+    if (!profile) {
+        throw new Error('Driver profile not found');
+    }
+    return profile;
 }
 
 export const driverServices = {
   updateAvailability,
   getDriverEarnings,
   getDriverEarningsAnalytics,
+  getMyDriverProfile,
 };

@@ -72,8 +72,30 @@ const getDriverEarningsAnalytics = async (req: AuthRequest, res: Response) => {
     }
 }
 
+const getMyDriverProfile = async (req: AuthRequest, res: Response) => {
+    try {
+        if (!req.user) {
+            return res.status(401).json({ success: false, message: 'Unauthorized' });
+        }
+        const driverId = req.user.userId;
+        const result = await driverServices.getMyDriverProfile(driverId);
+        res.status(200).json({
+            success: true,
+            message: "Driver profile fetched successfully!",
+            data: result
+        });
+    } catch (error: unknown) {
+        res.status(400).json({
+            success: false,
+            message: 'Failed to fetch driver profile',
+            error: error instanceof Error ? error.message : 'Unknown error'
+        });
+    }
+};
+
 export const driverControllers = {
   updateAvailability,
   getDriverEarnings,
   getDriverEarningsAnalytics,
+  getMyDriverProfile,
 };

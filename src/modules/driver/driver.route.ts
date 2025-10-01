@@ -22,4 +22,10 @@ router.get(
     driverControllers.getDriverEarningsAnalytics
 );
 
+router.get(
+  '/me',
+  authMiddleware(['driver']),
+  driverControllers.getMyDriverProfile
+);
+
 export const DriverRoutes = router;
