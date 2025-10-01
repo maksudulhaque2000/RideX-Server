@@ -13,5 +13,6 @@ router.patch('/:id/accept', authMiddleware(['driver']), rideControllers.acceptRi
 router.patch('/:id/status', authMiddleware(['driver']), rideControllers.updateRideStatus);
 router.get('/driver/active-ride', authMiddleware(['driver']), rideControllers.getActiveRideAsDriver);
 router.patch('/:id/reject', authMiddleware(['driver']), rideControllers.rejectRide);
+router.get('/history/driver', authMiddleware(['driver']), rideControllers.getDriverHistory);
 
 export const RideRoutes = router;

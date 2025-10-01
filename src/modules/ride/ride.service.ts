@@ -111,6 +111,11 @@ const rejectRide = async (rideId: string) => {
     return ride;
 }
 
+const getDriverHistory = async (driverId: string) => {
+    const rides = await Ride.find({ driverId }).populate('riderId', 'name');
+    return rides;
+}
+
 export const rideServices = {
   cancelRide,
   getRiderHistory,
@@ -120,4 +125,5 @@ export const rideServices = {
   getActiveRideAsDriver,
   getActiveRideAsRider,
   rejectRide,
+  getDriverHistory,
 };

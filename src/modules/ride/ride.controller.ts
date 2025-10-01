@@ -153,6 +153,21 @@ const rejectRide = async (req: AuthRequest, res: Response) => {
     }
 }
 
+const getDriverHistory = async (req: AuthRequest, res: Response) => {
+    try {
+        if (!req.user) return res.status(401).json({ success: false, message: 'Unauthorized' });
+        const driverId = req.user.userId;
+        const result = await rideServices.getDriverHistory(driverId);
+        res.status(200).json({
+            success: true,
+            message: 'Driver ride history fetched successfully',
+            data: result,
+        });
+    } catch (error: unknown) {
+        res.status(400).json({ success: false, message: 'Failed to fetch driver history', error: error instanceof Error ? error.message : 'Unknown error' });
+    }
+}
+
 
 export const rideControllers = {
   requestRide,
@@ -164,4 +179,5 @@ export const rideControllers = {
   getActiveRideAsDriver,
   getActiveRideAsRider,
   rejectRide,
+  getDriverHistory,
 };
