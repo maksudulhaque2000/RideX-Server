@@ -121,6 +121,38 @@ const updateRideStatus = async (req: AuthRequest, res: Response) => {
     }
 };
 
+const getActiveRideAsDriver = async (req: AuthRequest, res: Response) => {
+    try {
+        if (!req.user) return res.status(401).json({ success: false, message: 'Unauthorized' });
+        const driverId = req.user.userId;
+        const result = await rideServices.getActiveRideAsDriver(driverId);
+        res.status(200).json({ success: true, message: "Active ride fetched successfully", data: result });
+    } catch (error: unknown) {
+        res.status(500).json({ success: false, message: 'Failed to fetch active ride', error: error instanceof Error ? error.message : 'Unknown error' });
+    }
+}
+
+const getActiveRideAsRider = async (req: AuthRequest, res: Response) => {
+    try {
+        if (!req.user) return res.status(401).json({ success: false, message: 'Unauthorized' });
+        const riderId = req.user.userId;
+        const result = await rideServices.getActiveRideAsRider(riderId);
+        res.status(200).json({ success: true, message: "Active ride fetched successfully for rider", data: result });
+    } catch (error: unknown) {
+        res.status(500).json({ success: false, message: 'Failed to fetch active ride', error: error instanceof Error ? error.message : 'Unknown error' });
+    }
+}
+
+const rejectRide = async (req: AuthRequest, res: Response) => {
+    try {
+        const { id } = req.params;
+        const result = await rideServices.rejectRide(id);
+        res.status(200).json({ success: true, message: "Ride rejected successfully", data: result });
+    } catch (error: unknown) {
+        res.status(400).json({ success: false, message: 'Failed to reject ride', error: error instanceof Error ? error.message : 'Unknown error' });
+    }
+}
+
 
 export const rideControllers = {
   requestRide,
@@ -129,4 +161,7 @@ export const rideControllers = {
   getPendingRideRequests,
   acceptRide,
   updateRideStatus,
+  getActiveRideAsDriver,
+  getActiveRideAsRider,
+  rejectRide,
 };

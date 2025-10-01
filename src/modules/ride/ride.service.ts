@@ -8,12 +8,10 @@ const cancelRide = async (rideId: string, riderId: string) => {
     throw new Error('Ride not found');
   }
 
-  // Ensure the user cancelling is the rider who requested it
   if (ride.riderId.toString() !== riderId) {
     throw new Error('You are not authorized to cancel this ride');
   }
 
-  // A ride can only be cancelled if it is in 'requested' or 'accepted' state
   if (ride.status !== 'requested' && ride.status !== 'accepted') {
     throw new Error(`Cannot cancel a ride with status: ${ride.status}`);
   }
@@ -82,10 +80,44 @@ const updateRideStatus = async (
   return ride;
 };
 
+const getActiveRideAsDriver = async (driverId: string) => {
+    const activeRide = await Ride.findOne({
+        driverId,
+        status: { $in: ['accepted', 'picked_up', 'in_transit'] }
+    }).populate('riderId', 'name email phone');
+    return activeRide;
+}
+
+const getActiveRideAsRider = async (riderId: string) => {
+    const activeRide = await Ride.findOne({
+        riderId,
+        status: { $in: ['accepted', 'picked_up', 'in_transit'] }
+    }).populate('driverId', 'name email phone vehicleDetails');
+    return activeRide;
+}
+
+const rejectRide = async (rideId: string) => {
+    const ride = await Ride.findByIdAndUpdate(rideId, 
+        { 
+            status: 'cancelled',
+            driverId: null,
+            $push: { rideHistory: { status: 'cancelled', timestamp: new Date() } }
+        },
+        { new: true }
+    );
+    if (!ride) {
+        throw new Error('Ride not found');
+    }
+    return ride;
+}
+
 export const rideServices = {
   cancelRide,
   getRiderHistory,
   getPendingRideRequests,
   acceptRide,
   updateRideStatus,
+  getActiveRideAsDriver,
+  getActiveRideAsRider,
+  rejectRide,
 };
