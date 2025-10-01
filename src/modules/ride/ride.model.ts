@@ -19,7 +19,8 @@ const rideSchema = new Schema({
   rideHistory: [{
       status: String,
       timestamp: { type: Date, default: Date.now }
-  }]
+  }],
+  rejectedBy: [{ type: Schema.Types.ObjectId, ref: 'User' }]
 }, { timestamps: true });
 
 export const Ride = model('Ride', rideSchema);

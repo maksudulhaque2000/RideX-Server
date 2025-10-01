@@ -1,5 +1,6 @@
 import { Ride } from './ride.model';
 import { Driver } from '../driver/driver.model';
+import mongoose from 'mongoose';
 
 const cancelRide = async (rideId: string, riderId: string) => {
   const ride = await Ride.findById(rideId);
@@ -27,19 +28,34 @@ const getRiderHistory = async (riderId: string) => {
   return rides;
 };
 
-const getPendingRideRequests = async (_driverId: string) => {
-    const driver = await Driver.findOne({userId: _driverId});
+const getDriverHistory = async (driverId: string) => {
+    const rides = await Ride.find({ driverId }).populate('riderId', 'name');
+    return rides;
+}
+
+const getPendingRideRequests = async (driverId: string) => {
+    const driver = await Driver.findOne({userId: driverId});
     if(!driver || driver.availability === 'offline' || driver.approvalStatus !== 'approved'){
         throw new Error('You must be an approved and online driver to see requests.')
     }
-  const rides = await Ride.find({ status: 'requested' }).populate(
-    'riderId',
-    'name',
-  );
-  return rides;
+    const rides = await Ride.find({ 
+        status: 'requested',
+        rejectedBy: { $nin: [driverId] } 
+    }).populate('riderId', 'name');
+
+    return rides;
 };
 
 const acceptRide = async (rideId: string, driverId: string) => {
+    const existingActiveRide = await Ride.findOne({
+        driverId: driverId,
+        status: { $in: ['accepted', 'picked_up', 'in_transit'] }
+    });
+
+    if (existingActiveRide) {
+        throw new Error('You are already on an active ride and cannot accept a new one.');
+    }
+
     const ride = await Ride.findById(rideId);
     if (!ride) {
         throw new Error('Ride not found');
@@ -48,8 +64,7 @@ const acceptRide = async (rideId: string, driverId: string) => {
         throw new Error('This ride is no longer available');
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ride.driverId = driverId as any;
+    ride.driverId = new mongoose.Types.ObjectId(driverId);
     ride.status = 'accepted';
     ride.rideHistory.push({ status: 'accepted', timestamp: new Date() });
     await ride.save();
@@ -61,7 +76,7 @@ const updateRideStatus = async (
   driverId: string,
   status: string,
 ) => {
-  const validStatuses = ['picked_up', 'in_transit', 'completed'];
+  const validStatuses = ['picked_up', 'in_transit', 'completed', 'cancelled'];
   if (!validStatuses.includes(status)) {
     throw new Error('Invalid ride status');
   }
@@ -74,7 +89,7 @@ const updateRideStatus = async (
     throw new Error('You are not assigned to this ride');
   }
 
-  ride.status = status as 'picked_up' | 'in_transit' | 'completed';
+  ride.status = status as 'picked_up' | 'in_transit' | 'completed' | 'cancelled';
   ride.rideHistory.push({ status, timestamp: new Date() });
   await ride.save();
   return ride;
@@ -82,7 +97,7 @@ const updateRideStatus = async (
 
 const getActiveRideAsDriver = async (driverId: string) => {
     const activeRide = await Ride.findOne({
-        driverId,
+        driverId: driverId,
         status: { $in: ['accepted', 'picked_up', 'in_transit'] }
     }).populate('riderId', 'name email phone');
     return activeRide;
@@ -90,18 +105,20 @@ const getActiveRideAsDriver = async (driverId: string) => {
 
 const getActiveRideAsRider = async (riderId: string) => {
     const activeRide = await Ride.findOne({
-        riderId,
+        riderId: riderId,
         status: { $in: ['accepted', 'picked_up', 'in_transit'] }
-    }).populate('driverId', 'name email phone vehicleDetails');
+    }).populate({
+        path: 'driverId',
+        select: 'name email phone'
+    });
     return activeRide;
 }
 
-const rejectRide = async (rideId: string) => {
-    const ride = await Ride.findByIdAndUpdate(rideId, 
+const rejectRide = async (rideId: string, driverId: string) => {
+    const ride = await Ride.findByIdAndUpdate(
+        rideId, 
         { 
-            status: 'cancelled',
-            driverId: null,
-            $push: { rideHistory: { status: 'cancelled', timestamp: new Date() } }
+            $addToSet: { rejectedBy: driverId } 
         },
         { new: true }
     );
@@ -111,19 +128,14 @@ const rejectRide = async (rideId: string) => {
     return ride;
 }
 
-const getDriverHistory = async (driverId: string) => {
-    const rides = await Ride.find({ driverId }).populate('riderId', 'name');
-    return rides;
-}
-
 export const rideServices = {
   cancelRide,
   getRiderHistory,
+  getDriverHistory,
   getPendingRideRequests,
   acceptRide,
   updateRideStatus,
   getActiveRideAsDriver,
   getActiveRideAsRider,
   rejectRide,
-  getDriverHistory,
 };
