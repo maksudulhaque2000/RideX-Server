@@ -58,11 +58,12 @@ const getRiderHistory = async (req: AuthRequest, res: Response) => {
     try {
         if (!req.user) return res.status(401).json({ success: false, message: 'Unauthorized' });
         const riderId = req.user.userId;
-        const result = await rideServices.getRiderHistory(riderId);
+        const result = await rideServices.getRiderHistory(riderId, req.query);
         res.status(200).json({
             success: true,
             message: 'Ride history fetched successfully',
-            data: result,
+            data: result.data,
+            meta: result.meta
         });
     } catch (error: unknown) {
         res.status(500).json({
@@ -165,11 +166,12 @@ const getDriverHistory = async (req: AuthRequest, res: Response) => {
     try {
         if (!req.user) return res.status(401).json({ success: false, message: 'Unauthorized' });
         const driverId = req.user.userId;
-        const result = await rideServices.getDriverHistory(driverId);
+        const result = await rideServices.getDriverHistory(driverId, req.query); // <-- পরিবর্তন এখানে
         res.status(200).json({
             success: true,
             message: 'Driver ride history fetched successfully',
-            data: result,
+            data: result.data,
+            meta: result.meta
         });
     } catch (error: unknown) {
         res.status(400).json({ success: false, message: 'Failed to fetch driver history', error: error instanceof Error ? error.message : 'Unknown error' });

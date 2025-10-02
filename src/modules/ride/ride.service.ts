@@ -23,14 +23,40 @@ const cancelRide = async (rideId: string, riderId: string) => {
   return ride;
 };
 
-const getRiderHistory = async (riderId: string) => {
-  const rides = await Ride.find({ riderId }).populate('driverId', 'name');
-  return rides;
+const getRiderHistory = async (riderId: string, query: Record<string, unknown>) => {
+    const { page = 1, limit = 10, status = '' } = query;
+    const skip = (Number(page) - 1) * Number(limit);
+    
+    const queryCondition: Record<string, any> = { riderId };
+    if (status) {
+        queryCondition.status = status;
+    }
+
+    const rides = await Ride.find(queryCondition).populate('driverId', 'name').skip(skip).limit(Number(limit));
+    const total = await Ride.countDocuments(queryCondition);
+
+    return {
+        meta: { page: Number(page), limit: Number(limit), total, totalPages: Math.ceil(total / Number(limit)) },
+        data: rides
+    };
 };
 
-const getDriverHistory = async (driverId: string) => {
-    const rides = await Ride.find({ driverId }).populate('riderId', 'name');
-    return rides;
+const getDriverHistory = async (driverId: string, query: Record<string, unknown>) => {
+    const { page = 1, limit = 10, status = '' } = query;
+    const skip = (Number(page) - 1) * Number(limit);
+
+    const queryCondition: Record<string, any> = { driverId };
+    if (status) {
+        queryCondition.status = status;
+    }
+
+    const rides = await Ride.find(queryCondition).populate('riderId', 'name').skip(skip).limit(Number(limit));
+    const total = await Ride.countDocuments(queryCondition);
+
+    return {
+        meta: { page: Number(page), limit: Number(limit), total, totalPages: Math.ceil(total / Number(limit)) },
+        data: rides
+    };
 }
 
 const getPendingRideRequests = async (driverId: string) => {
