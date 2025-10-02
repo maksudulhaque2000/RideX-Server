@@ -9,13 +9,18 @@ interface AuthRequest extends Request {
 const requestRide = async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user) return res.status(401).json({ success: false, message: 'Unauthorized' });
-    const { pickupLocation, destinationLocation } = req.body;
+    const { pickupLocation, destinationLocation, fare } = req.body;
     const riderId = req.user.userId;
+
+    if (!fare || fare <= 0) {
+        return res.status(400).json({ success: false, message: 'Valid fare amount is required.' });
+    }
 
     const newRide = new Ride({
       riderId,
       pickupLocation,
       destinationLocation,
+      fare,
       rideHistory: [{ status: 'requested', timestamp: new Date() }],
     });
 
