@@ -5,12 +5,13 @@ const updateMyProfileInDB = async (
   userId: string,
   payload: Record<string, unknown>,
 ) => {
-  const { name, phone, address, vehicleDetails, licenseNumber } = payload;
+  const { name, phone, address, vehicleDetails, licenseNumber, profileImage } = payload;
 
   const updatedUserData: Record<string, unknown> = {};
   if (name) updatedUserData.name = name;
   if (phone) updatedUserData.phone = phone;
   if (address) updatedUserData.address = address;
+  if (profileImage) updatedUserData.profileImage = profileImage;
   
   const updatedUser = await User.findByIdAndUpdate(userId, updatedUserData, {
     new: true,

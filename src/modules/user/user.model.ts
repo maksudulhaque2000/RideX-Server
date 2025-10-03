@@ -10,9 +10,9 @@ const userSchema = new Schema({
   isBlocked: { type: Boolean, default: false },
   phone: { type: String, trim: true },
   address: { type: String, trim: true },
+  profileImage: { type: String }, 
 }, { timestamps: true });
 
-// Password hashing middleware
 userSchema.pre('save', async function(next) {
   if (this.isModified('password')) {
     this.password = await bcrypt.hash(this.password, Number(config.bcrypt_salt_rounds));
