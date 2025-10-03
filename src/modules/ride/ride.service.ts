@@ -27,7 +27,7 @@ const getRiderHistory = async (riderId: string, query: Record<string, unknown>) 
     const { page = 1, limit = 10, status = '' } = query;
     const skip = (Number(page) - 1) * Number(limit);
     
-    const queryCondition: Record<string, any> = { riderId };
+    const queryCondition: Record<string, unknown> = { riderId };
     if (status) {
         queryCondition.status = status;
     }
@@ -45,7 +45,7 @@ const getDriverHistory = async (driverId: string, query: Record<string, unknown>
     const { page = 1, limit = 10, status = '' } = query;
     const skip = (Number(page) - 1) * Number(limit);
 
-    const queryCondition: Record<string, any> = { driverId };
+    const queryCondition: Record<string, unknown> = { driverId };
     if (status) {
         queryCondition.status = status;
     }

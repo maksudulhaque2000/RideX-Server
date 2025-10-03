@@ -7,7 +7,7 @@ const getAllUsers = async (query: Record<string, unknown>) => {
 
   const skip = (Number(page) - 1) * Number(limit);
   
-  const queryCondition: Record<string, any> = {};
+  const queryCondition: Record<string, unknown> = {};
 
   if (role) {
     queryCondition.role = role;

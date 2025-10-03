@@ -10,10 +10,12 @@ const app: Application = express();
 
 // Middlewares
 app.use(express.json());
+app.use(cors());
 
 const allowedOrigins = [
   'http://localhost:5173',
   'https://ride-x-puce.vercel.app/',
+  'https://ride-x-puce.vercel.app',
 ];
 
 app.use(cors({
