@@ -1,11 +1,5 @@
 # RideX - Ride Booking API
 
-![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
-![Node.js](https://img.shields.io/badge/Node.js-18.x-blue?logo=node.js)
-![Express.js](https://img.shields.io/badge/Express.js-4.x-green?logo=express)
-![MongoDB](https://img.shields.io/badge/MongoDB-6.x-brightgreen?logo=mongodb)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?logo=typescript)
-
 A secure, scalable, and role-based backend API for a ride-booking system (like Uber or Pathao). This project provides a robust foundation for a ride-sharing application, featuring distinct functionalities for riders, drivers, and administrators.
 
 ## 🌐 [Live Deployment Link](https://ridex-server-seven.vercel.app/)
