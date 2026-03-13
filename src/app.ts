@@ -16,6 +16,8 @@ const allowedOrigins = [
   'http://localhost:5173',
   'https://ride-x-puce.vercel.app/',
   'https://ride-x-puce.vercel.app',
+  'https://ride-x-flame.vercel.app/',
+  'https://ride-x-flame.vercel.app',
 ];
 
 app.use(cors({
