@@ -1,4 +1,8 @@
-# RideX Server
+<h1 align="center">RideX Server</h1>
+
+<div align="center">
+  <img src="./src/public/server.png" height="400" width="800" alt="SocialSpark"/>
+</div>
 
 <p align="center">
   <a href="https://ridex-server-seven.vercel.app/" target="_blank" rel="noreferrer">
